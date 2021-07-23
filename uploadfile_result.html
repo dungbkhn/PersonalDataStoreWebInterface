@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="./.favicon.ico">
+<title>Upload Contents</title>
+<style>
+	
+* {
+	padding:0;
+	margin:0;
+}
+
+body {
+	font: 14px Sans-Serif;
+	padding: 50px;
+	background: #eee;
+}
+
+h1 {
+	text-align: center;
+	padding: 20px 0 12px 0;
+	margin: 0;
+}
+
+h2 {
+	font-size: 16px;
+	text-align: center;
+	padding: 0 0 12px 0; 
+
+}
+
+#container {
+	box-shadow: 0 5px 10px -5px rgba(0,0,0,0.5);
+	position: relative;
+	background: white; 
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 15px 0;
+}
+
+
+.btun {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  font-family: arial, sans-serif;
+  color: #9ACD32;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* dong tieu de cua bang */
+th {
+	background-color: #4169E1;
+	color: #FFF;
+	padding: 5px 10px;
+	text-align: left;
+}
+
+th small {
+	font-size: 9px; 
+}
+
+
+th:first-of-type {
+	padding-left: 35px;
+}
+
+
+
+tr:nth-of-type(odd) {
+	background-color: #E6E6E6;
+}
+
+tr:hover td {
+	background-color:#CACACA;
+}
+
+img { 
+                width: 20%; 
+                height: 20%; 
+                object-fit: contain; 
+} 
+  
+td {
+		padding: 5px 10px;
+}          
+
+.td1{
+}
+
+.td2{
+	width:10%;
+}
+
+.file{
+	border-bottom: 1px solid #000;
+}
+
+.dir{
+	border-bottom: 1px solid #000;
+}
+
+/* files */
+td:first-of-type p {
+	background: url(./images/file.png) no-repeat 10px;
+	width: 75%;
+	padding-left: 35px;
+}
+
+/* directories */
+table tr.dir td:first-of-type p {
+	background-image: url(./images/folder.png);
+}
+
+</style>
+
+<script>
+	let stillupload = false;
+	window.onload = function(){
+ 
+		  
+	};
+	
+	function logout(){
+		window.location.href='./logout?p='+ document.getElementById("token").value + ':';
+	}
+	
+	function back(){
+		window.location.href='./path?p='+ document.getElementById("token").value + ':' + document.getElementById("path").value;
+	}
+	
+	function continueupload(){
+		window.location.href='./upload?token='+ document.getElementById("token").value + '&currentdir=' + document.getElementById("path").value;
+	}
+	
+</script>
+
+</head>
+<body>
+	
+<div>
+<input type=button id="logout"  value='Logout' onclick = "logout()">
+<input type=button id="back"  value='Back' onclick = "back()">
+</div>
+
+<div id="container">
+<h1>My Storage / Upload to:</h1>
+
+

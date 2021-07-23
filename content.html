@@ -1,0 +1,798 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="./.favicon.ico">
+<title>Directory Contents</title>
+<style>
+	
+* {
+	padding:0;
+	margin:0;
+}
+
+body {
+	color: #333;
+	font: 14px Sans-Serif;
+	padding: 50px;
+	background: #eee;
+}
+
+h1 {
+	text-align: center;
+	padding: 20px 0 12px 0;
+	margin: 0;
+}
+h2 {
+	font-size: 16px;
+	text-align: center;
+	padding: 0 0 12px 0; 
+}
+
+#container {
+	box-shadow: 0 5px 10px -5px rgba(0,0,0,0.5);
+	position: relative;
+	background: transparent; 
+	padding-top: 5px;
+}
+
+.column1 {
+  float: left;
+  width: 60%;
+  padding: 10px;
+  //height: 10%; /* Should be removed. Only for demonstration */
+}
+
+.column2 {
+  float: left;
+  width: 34.5%;
+  padding: 20px;
+  //height: 10%; /* Should be removed. Only for demonstration */
+}
+
+.mylink{
+	background: none!important;
+  border: none;
+  padding: 0!important;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
+  color: #00008B;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+table {
+	background-color: #F3F3F3;
+	border-collapse: collapse;
+	width: 100%;
+	margin: 15px 0;
+}
+
+.cbox {
+
+	margin: 10px;
+}
+
+.my-link{
+	
+}
+
+.btun {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
+  color: #9ACD32;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+th {
+	background-color: #4169E1;
+	color: #FFF;
+	padding: 5px 10px;
+}
+
+th small {
+	font-size: 9px; 
+}
+
+td, th {
+	text-align: left;
+}
+
+a {
+	text-decoration: none;
+}
+
+td a {
+	color: #663300;
+	display: block;
+	padding: 5px 10px;
+}
+
+td p {
+	color: #663300;
+	display: block;
+	padding: 5px 10px;
+}
+
+th a {
+	padding-left: 0
+}
+
+td:first-of-type p {
+	background: url(./images/file.png) no-repeat 10px 50%;
+	padding-left: 35px;
+}
+
+td:first-of-type a {
+	background: url(./images/file.png) no-repeat 10px 50%;
+	padding-left: 35px;
+}
+th:first-of-type {
+	padding-left: 35px;
+}
+
+td:not(:first-of-type) a {
+	background-image: none !important;
+} 
+
+tr:nth-of-type(odd) {
+	background-color: #E6E6E6;
+}
+
+tr:hover td {
+	background-color:#CACACA;
+}
+
+tr:hover td a {
+	color: #000;
+}
+
+/* directories */
+table tr.dir td:first-of-type a
+{background-image: url(./images/BlueFolder.png);background-size: 22px 22px;}
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-message-box@3.2.2/dist/messagebox.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-message-box@3.2.2/dist/messagebox.min.css"> 
+
+<script>
+
+$(document).ready(function(){
+  var refreshIntervalId,refreshDelIntervalId,del = false,setup = false,selectlabel = false;;
+  var waittext="  (zipping...";
+  var waitdeltext="  (deleting...";
+  var numreq=0,numdelreq=0;
+
+  if($("#path").val()==''){
+	$( "#currentpath" ).html('/');
+	console.log('n1');
+  }
+  else{
+	$( "#currentpath" ).html($("#path").val().hexDecode());
+	console.log('n2')
+  }
+	
+  $("#mystatus").html("  Select files to download or delete or view.");
+  
+  //$( "#logout" ).submit(function( event ) {
+  //});
+  $( "#logout" ).click(function(  ) {
+	window.location.href='./logout?p='+$("#token").val() + ':'+$("#path").val();
+  });
+  
+  $( "#option" ).click(function(  ) {
+	 if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	
+	window.location.href='./option?token='+$("#token").val() + '&currentdir='+$("#path").val(); 
+  });
+  
+  $("#refresh").click(function(){
+    if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	window.location.href='./refresh?token='+$("#token").val() + '&currentdir='+$("#path").val(); 
+	  
+  });
+  
+  $("#newdir").click(function(){
+    if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	
+	
+	if ($("#path").val().trim().localeCompare("")==0){
+		$.MessageBox("Can not make new dir in root folder!");
+		return;
+	}
+	
+	if ($("#path").val().trim().hexDecode().indexOf("/backup")!=-1){
+		$.MessageBox("Can not make new dir in backup folder!");
+		return;
+	}
+	
+	// Simple textbox
+	$.MessageBox({
+		input    : true,
+		message  : "Input directory name:"
+	}).done(function(data){
+		if((data.trim().indexOf("*")!=-1)||(data.trim().indexOf('"')!=-1)||(data.trim().indexOf("|")!=-1)||(data.trim().indexOf(":")!=-1)||(data.trim().indexOf("\\")!=-1)||(data.trim().indexOf("/")!=-1)||(data.trim().indexOf("?")!=-1)||(data.trim().indexOf("<")!=-1)||(data.trim().indexOf(">")!=-1)){
+			$.MessageBox("Name can not contain special char as * \" | : / \ ? < >");
+		}
+		else if(data.trim()!='')
+			window.location.href='./mkdir?token='+$("#token").val() + '&currentdir='+$("#path").val() + '&dname=' + data.trim().hexEncode() ;
+		else{
+			$.MessageBox("Name can not be empty!");
+		}
+	});
+	  
+  });
+  
+  $("#rename").click(function(){
+    if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	
+	if ($("#path").val().trim().localeCompare("")==0){
+		$.MessageBox("Can not rename in root folder!");
+		return;
+	}
+	
+	if ($("#path").val().trim().hexDecode().indexOf("/backup")!=-1){
+		$.MessageBox("Can not rename in backup folder!");
+		return;
+	}
+	
+	let fn = getOneItemChecked() ;
+	if(fn==''){
+		$("#mystatus").html("  Oh please select one dir or one file");
+		return;
+	}
+  // Simple textbox
+	$.MessageBox({
+		input    : true,
+		message  : "Input new name:"
+	}).done(function(data){
+		if((data.trim().indexOf("*")!=-1)||(data.trim().indexOf('"')!=-1)||(data.trim().indexOf("|")!=-1)||(data.trim().indexOf(":")!=-1)||(data.trim().indexOf("\\")!=-1)||(data.trim().indexOf("/")!=-1)||(data.trim().indexOf("?")!=-1)||(data.trim().indexOf("<")!=-1)||(data.trim().indexOf(">")!=-1)){
+			$.MessageBox("Name can not contain special char as * \" | : / \ ? < >");
+		}
+		else if(data.trim()!='')
+			window.location.href='./rename?token='+$("#token").val() + '&currentdir='+$("#path").val() + '&dname=' + data.trim().hexEncode() + '&oname=' + fn.hexEncode() ;
+		else{
+			$.MessageBox("New name can not be empty!");
+		}
+	});
+  
+  });
+  
+  $("#viewfile").click(function(){
+	 if(hasChecked()===false) {
+		if($("#maxnum").val()==0){
+			$("#mystatus").html("  No files to view.");
+			return;
+		}
+		selectlabel = !selectlabel;
+		if(selectlabel===true)
+			$("#mystatus").html("  Please select files to view.");
+		else
+			$("#mystatus").html("  Oh, please! please select files to view. Do not press so mutch.");
+		return;
+	}
+	
+	
+    if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	//if select more than one file
+	let fn = getOneFileChecked() ;
+	if(fn==''){
+		$("#mystatus").html("  Oh please select one file");
+		return;
+	}
+	window.location.href='./viewfile?token='+$("#token").val() + '&currentdir='+$("#path").val() + '&fname=' + fn.hexEncode(); 
+  });
+  
+  $("#genlink").click(function(){
+	 if ($("#path").val().trim().localeCompare("")==0){
+		$.MessageBox("Can not gen link in root folder!");
+		return;
+	 }
+	
+	 if(hasChecked()===false) {
+		if($("#maxnum").val()==0){
+			$("#mystatus").html("  No files to down.");
+			return;
+		}
+		selectlabel = !selectlabel;
+		if(selectlabel===true)
+			$("#mystatus").html("  Please select files to down.");
+		else
+			$("#mystatus").html("  Oh, please! please select files to down. Do not press so mutch.");
+		return;
+	}
+	
+	
+    if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	
+	
+	//if select more than one file
+	let fn = getOneFileChecked() ;
+	if(fn==''){
+		$("#mystatus").html("  Oh please select one file");
+		return;
+	}
+	window.location.href='./gendownlink?token='+$("#token").val() + '&currentdir='+$("#path").val() + '&fname=' + fn.hexEncode(); 
+  });
+  
+  $("#upload").click(function(){
+    if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	
+	
+	if ($("#path").val().trim().localeCompare("")==0){
+		$.MessageBox("Can not upload in root folder!");
+		return;
+	}
+	
+	if ($("#path").val().trim().hexDecode().indexOf("/backup")!=-1){
+		$.MessageBox("Can not upload in backup folder!");
+		return;
+	}
+		
+	  window.location.href='./upload?token='+$("#token").val() + '&currentdir='+$("#path").val();
+  });
+  
+  $("#del").click(function(){
+	if ($("#path").val().trim().localeCompare("")==0){
+		$.MessageBox("Can not delete in root folder!");
+		return;
+	}
+	
+	if ($("#path").val().trim().hexDecode().indexOf("/backup")!=-1){
+		$.MessageBox("Can not delete in backup folder!");
+		return;
+	}
+	
+	if(hasChecked()===false) {
+		if($("#maxnum").val()==0){
+			$("#mystatus").html("  No files to delete.");
+			return;
+		}
+		selectlabel = !selectlabel;
+		if(selectlabel===true)
+			$("#mystatus").html("  Please select files to delete.");
+		else
+			$("#mystatus").html("  Oh, please! please select files to delete. Do not press so mutch.");
+		return;
+	}
+	
+    if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	
+	$.MessageBox({
+				buttonDone  : "OK",
+				buttonFail  : "Cancel",
+				message     : "Do you really want to delete file(s)?"
+	}).done(function(data, button){
+		window.location.href='./del?token='+$("#token").val() + '&currentdir='+$("#path").val() + '&dname=' + getChecked().hexEncode();
+
+		$('a').bind('click', function(e){
+			e.preventDefault();
+			$("#mystatus").html("  Still deleting, please wait.");
+		});
+		
+		$("#mystatus").html(waitdeltext+")");
+		del = true;
+		refreshDelIntervalId = setInterval(loopcalldeleteajax, 2000);
+		
+	}).fail(function(data, button){
+		//console.log("Handler: .fail()");
+		//console.log("Button: " + button);
+	});
+			
+  });
+  
+  $("#down").click(function(){
+	if ($("#path").val().trim().localeCompare("")==0){
+		$.MessageBox("Can not download in root folder!");
+		return;
+	}
+	
+	if(hasChecked()===false) {
+		if($("#maxnum").val()==0){
+			$("#mystatus").html("  No files to download.");
+			return;
+		}
+		selectlabel = !selectlabel;
+		if(selectlabel===true)
+			$("#mystatus").html("  Please select files to download.");
+		else
+			$("#mystatus").html("  Oh, please! please select files to download. Do not press so mutch.");
+		return;
+	}
+	
+	if(setup===true){
+		$("#mystatus").html("  Still downloading, please wait.");
+		return;
+	}
+	
+	if(del===true){
+		$("#mystatus").html("  Still deleting, please wait.");
+		return;
+	}
+	
+	
+	
+   window.location.href='./download?p='+$("#token").val() + ':'+$("#path").val() +'-'+ getChecked().hexEncode();
+
+   if(hasonefileChecked()==true)
+		return;
+		
+    $('a').bind('click', function(e){
+        e.preventDefault();
+        $("#mystatus").html("  Still downloading, please wait.");
+	})
+    
+   $("#mystatus").html(waittext+")");
+   setup = true;
+   refreshIntervalId = setInterval(loopcallajax, 2000);
+
+  });
+  
+function loopcalldeleteajax()
+ {
+  //this will repeat every 5 seconds
+  //you can reset counter here
+  $.ajax({
+        url: './nodejs_ajax_del?p='+$("#token").val()+ ':',
+        dataType: "jsonp",
+        jsonpCallback: "_testcb",
+        cache: false,
+        timeout: 1000,
+        success: function(data) {
+            //$("#test").append(data);
+            let s = data.toString();
+            let s2 = s.substring(0,s.lastIndexOf(':'));
+            if(s2==='Error'){
+				restartdelvars();
+				return;
+			}
+            s = s.substring(s.indexOf('"')+1,s.lastIndexOf('"'));
+            
+            if(s==="deletefile_abcd"){
+            //if(true){
+				restartdelvars();
+			}
+			else if(s==='')
+			{
+				restartdelvars();
+			}
+			else{
+				numdelreq++;
+				if(numdelreq > 20){
+					numdelreq = 0;
+					waitdeltext = "  (deleting";
+				}
+				waitdeltext = waitdeltext + "...";
+				$("#mystatus").html(waitdeltext + ")");
+			}
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            //console.log('error ' + textStatus + " " + errorThrown);
+            restartdelvars();
+        }
+    });
+  }
+ 
+ function loopcallajax()
+ {
+  //this will repeat every 5 seconds
+  //you can reset counter here
+  $.ajax({
+        url: './nodejs_ajax?p='+$("#token").val()+ ':',
+        dataType: "jsonp",
+        jsonpCallback: "_testcb",
+        cache: false,
+        timeout: 1000,
+        success: function(data) {
+            //$("#test").append(data);
+            let s = data.toString();
+            let s2 = s.substring(0,s.lastIndexOf(':'));
+            if(s2==='Error'){
+				restartvars();
+				return;
+			}
+            s = s.substring(s.indexOf('"')+1,s.lastIndexOf('"'));
+            
+            if(s==="zipout"){
+            //if(true){
+				restartvars();
+			}
+			else if(s==='')
+			{
+				restartvars();
+			}
+			else{
+				numreq++;
+				if(numreq > 20){
+					numreq = 0;
+					waittext = "  (zipping";
+				}
+				waittext = waittext + "...";
+				$("#mystatus").html(waittext + ")");
+			}
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            //console.log('error ' + textStatus + " " + errorThrown);
+            restartvars();
+        }
+    });
+  }
+  
+ function restartvars()
+ {
+	setup = false;
+	clearInterval(refreshIntervalId);
+	waittext = "  (zipping..."
+	$("#mystatus").html("  Select files to download or delete or view.");
+	$('a').unbind('click');
+ }
+  
+  function restartdelvars()
+ {
+	del = false;
+	clearInterval(refreshDelIntervalId);
+	waitdeltext = "  (deleting..."
+	$("#mystatus").html("  Select files to download or delete or view.");
+	$('a').unbind('click');
+ }
+ 
+ 
+});
+
+  function terms_change(checkbox){
+    //If it is checked.
+    var res = checkbox.id.split(" ");
+    var tr = document.getElementById("tr "+res[1]);
+    if(checkbox.checked){
+        //alert('Checkbox has been ticked!' + res[1]);
+ 	
+	tr.style.backgroundColor = "#BBBBBB";
+    }
+    //If it has been unchecked.
+    else{
+        //alert('Checkbox has been unticked!');
+	
+	tr.style.backgroundColor = "";
+    }
+
+   } 
+
+  
+  function selectall(){
+    //If it is checked.
+   if(document.getElementById("selectbutton").childNodes[0].nodeValue === 'Select All')
+   {
+    document.getElementById("selectbutton").childNodes[0].nodeValue = "UnSelect All";
+    var maxnum = document.getElementById("maxnum");
+    //alert('Checkbox has been unticked!' + document.getElementById("selectbutton").childNodes[0].nodeValue);
+    var i;
+    for (i = 1; i <= maxnum.value; i++) {
+	document.getElementById("cbox "+i).checked = true;
+        document.getElementById("tr "+i).style.backgroundColor = "#BBBBBB";
+    }	 
+   } 
+   else
+   {
+     document.getElementById("selectbutton").childNodes[0].nodeValue = "Select All";
+    var maxnum = document.getElementById("maxnum");
+    //alert('Checkbox has been unticked!' + document.getElementById("selectbutton").childNodes[0].nodeValue);
+    var i;
+    for (i = 1; i <= maxnum.value; i++) {
+	document.getElementById("cbox "+i).checked = false;
+        document.getElementById("tr "+i).style.backgroundColor = "";
+    }	 
+   }
+  }
+
+  function hasChecked(){
+	var i,strout = '';
+    for (i = 1; i <= maxnum.value; i++) 
+	  if(document.getElementById("cbox "+i).checked === true)
+		return true;
+		
+	return false;
+  }
+  
+  function hasonefileChecked(){
+	var i,k=0;
+    for (i = 1; i <= maxnum.value; i++) 
+	  if(document.getElementById("cbox "+i).checked === true)
+	  {
+		  if(document.getElementById("cbox "+i).name.charAt(0)!=='/')
+			k++;
+		  else 
+		    k = 100;
+	  }
+	  
+	if(k==1)
+		return true;
+	else return false;
+  }
+  
+  function getChecked(){
+	var i,strout = '',strout2='';
+    for (i = 1; i <= maxnum.value; i++) 
+	  if(document.getElementById("cbox "+i).checked === true)
+	  {
+		  if(document.getElementById("cbox "+i).name.charAt(0)==='/')
+				strout = strout + ":" + document.getElementById("cbox "+i).name;
+		  else
+				strout2 = strout2 + ":" + document.getElementById("cbox "+i).name;
+	  }
+	  
+	return strout+strout2;
+  }
+  
+  function getOneFileChecked(){
+	var i,c=0,str='';
+    for (i = 1; i <= maxnum.value; i++) 
+	  if(document.getElementById("cbox "+i).checked === true)
+	  {
+		  if(document.getElementById("cbox "+i).name.charAt(0)==='/')
+				return '';
+		  else{
+				c++;
+				str = document.getElementById("cbox "+i).name;
+				if(c>1) return '';
+		  }
+	  }
+	  if(c==1) return str;
+	  else
+			   return '';
+  }
+  
+  function getOneItemChecked(){
+	var i,str='',c=0;
+    for (i = 1; i <= maxnum.value; i++) 
+	  if(document.getElementById("cbox "+i).checked === true)
+	  {
+		  c++;
+		  if(c==1)
+			  if(document.getElementById("cbox "+i).name.charAt(0)==='/'){
+					str = document.getElementById("cbox "+i).name;
+					str = str.substring(str.lastIndexOf("/")+1,str.length);
+			  }
+			  else 
+				str = document.getElementById("cbox "+i).name;
+	  }
+	  
+	  if(c==1) return str;
+	  else return '';
+  }
+  String.prototype.hexDecode = function(){
+    var j;
+    var hexes = this.match(/.{1,4}/g) || [];
+    var back = "";
+    for(j = 0; j<hexes.length; j++) {
+        back += String.fromCharCode(parseInt(hexes[j], 16));
+    }
+
+    return back;
+}
+
+String.prototype.hexEncode = function(){
+    var hex, i;
+
+    var result = "";
+    for (i=0; i<this.length; i++) {
+        hex = this.charCodeAt(i).toString(16);
+        result += ("000"+hex).slice(-4);
+    }
+
+    return result
+}
+</script>
+</head>
+<body>
+
+<div>
+<input id="logout" name="logout" type="button" value="Logout">
+<input type="button" id="option"  name="option" value="Option">
+</div>
+
+<div id="container" >
+<div style="font-size:34px;font-weight: bold;text-align:center;">My Storage</div>
+
+<div>
+  <div class="column1">
+    <div style="font-size:24px;text-align:center">Current Path</div>
+    <h4 id="currentpath" style="text-align:center"></h4>
+    <p id="mystatus" style="padding-top:50px;padding-left: 10px;">    </p>
+  </div>
+  <div class="column2" style="background-color:#ddd; border-left: 4px solid blue;">
+	<h3><p>Only Share Folder:</p></h3>
+	<h3><input type=button id="rename" class="mylink" value='Rename Dir/File'></h3>
+	<h3><input type=button id="del"  class="mylink" value='Delete Selected Items'></h3>
+	<h3><input type=button id="upload" class="mylink"  value='Upload'></h3>
+	<h3><input type=button id="newdir" class="mylink" value='Create New Dir'></h3>
+	<br>
+	<h3><p>Both Share and Backup Folders:</p></h3>
+	<h3><input type=button id="viewfile" class="mylink" value='View File'></h3>
+	<h3><input type=button id="down" class="mylink" value='Download Selected Items'></h3>
+	<h3><input type=button id="refresh" class="mylink" value='Refresh'></h3>
+	<h3><input type=button id="genlink" class="mylink" value='Generate Download Link'></h3>
+  </div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th></th>
+
+
+
+
+
+
+

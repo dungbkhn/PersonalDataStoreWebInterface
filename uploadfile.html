@@ -1,0 +1,265 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="./.favicon.ico">
+<title>Upload Contents</title>
+<style>
+	
+* {
+	padding:0;
+	margin:0;
+}
+
+body {
+	font: 14px Sans-Serif;
+	padding: 50px;
+	background: #eee;
+}
+
+h1 {
+	text-align: center;
+	padding: 20px 0 12px 0;
+	margin: 0;
+}
+
+h2 {
+	font-size: 16px;
+	text-align: center;
+	padding: 0 0 12px 0; 
+
+}
+
+h3 {
+	font-size: 13px;
+	text-align: left;
+	padding: 0 0 12px 0; 
+
+}
+
+#container {
+	box-shadow: 0 5px 10px -5px rgba(0,0,0,0.5);
+	position: relative;
+	background: white; 
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 15px 0;
+}
+
+
+.btun {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  font-family: arial, sans-serif;
+  color: #9ACD32;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* dong tieu de cua bang */
+th {
+	background-color: #4169E1;
+	color: #FFF;
+	padding: 5px 10px;
+	text-align: left;
+}
+
+th small {
+	font-size: 9px; 
+}
+
+
+th:first-of-type {
+	padding-left: 35px;
+}
+
+
+
+tr:nth-of-type(odd) {
+	background-color: #E6E6E6;
+}
+
+tr:hover td {
+	background-color:#CACACA;
+}
+
+img { 
+                width: 20%; 
+                height: 20%; 
+                object-fit: contain; 
+} 
+  
+td {
+		padding: 5px 10px;
+}          
+
+.td1{
+}
+
+.td2{
+	width:10%;
+}
+
+.file{
+	border-bottom: 1px solid #000;
+}
+
+.dir{
+	border-bottom: 1px solid #000;
+}
+
+/* files */
+td:first-of-type p {
+	background: url(./images/file.png) no-repeat 10px;
+	width: 75%;
+	padding-left: 35px;
+}
+
+/* directories */
+table tr.dir td:first-of-type p {
+	background-image: url(./images/folder.png);
+}
+
+</style>
+
+<script>
+	let stillupload = false;
+	let mestext = '...';
+	let n = 1;
+	
+	window.onload = function(){
+		  let fileCatcher = document.getElementById("file-catcher");
+		  let fileInput = document.getElementById("file-input");
+		  
+		  let fileList = [];
+		  let renderFileList, insertNewRow, sendFile;
+		  let trid = 1;
+		  
+		  
+		  document.getElementById("submitbutton").disabled = true;
+		  
+		  insertNewRow = function (name) {
+			let table = document.getElementById("myTable");
+			// Create an empty <tr> element and add it to the 1st position of the table:
+			let row = table.insertRow(trid);
+			row.setAttribute("class","file");
+			row.setAttribute("id","tr " + trid);
+			row.setAttribute("style","border-bottom: 1px solid #000;");
+			// Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+			let cell1 = row.insertCell(0);
+			let cell2 = row.insertCell(1);
+			let cell3 = row.insertCell(2);
+			
+			// Add some text to the new cells:
+			cell1.setAttribute("class","td1");
+			cell1.innerHTML = '<p>' + name + '</p>'; 
+			cell2.setAttribute("class","td2");
+			cell2.innerHTML = '';//'<img src="./.images/gif/2.gif" ></img>';
+			trid++;
+		  };
+		  
+		  renderFileList = function () {
+			let table = document.getElementById("myTable");
+
+			//delete all rows
+			for (let i = trid-1; i>0; i--) 
+					table.deleteRow(i);
+
+			trid = 1;
+			
+			fileList.forEach(function (file, index) {
+				insertNewRow(file.name);
+			});
+		  };
+		  
+		  fileInput.addEventListener('change', function (e) {
+			fileList = [];
+			//document.getElementById("submitbutton").disabled = false;
+			
+			if(fileInput.files.length > 30){
+				document.getElementById("submitbutton").disabled = true;
+			}
+			else {
+				document.getElementById("submitbutton").disabled = false;
+			}
+			
+			for (var i = 0; i < fileInput.files.length; i++) {
+				fileList.push(fileInput.files[i]);
+			}
+			renderFileList();
+		  });
+		  
+		  fileCatcher.addEventListener('submit', function (e) {
+			  stillupload = true;
+			  document.getElementById("submitbutton").disabled = true;
+			  //document.getElementById("file-input").disabled = true;
+			  setTimeout(function(){ 
+				    document.getElementById("file-input").disabled = true;
+				    let table = document.getElementById("myTable");
+					let row,cell2;
+					for (let i = trid-1; i>0; i--) {
+						row = table.rows[i];
+						cell2 = row.cells[1];
+						cell2.innerHTML = '<img src="./images/2.gif" ></img>';
+					} 
+				}, 250);
+		  });
+	};
+	
+	function logout(){
+		window.location.href='./logout?p='+ document.getElementById("token").value + ':';
+	}
+	
+	function back(){
+		n++;
+		if(n>5) {n=1;mestext='...';}
+		
+		for (let i = n; i>0; i--) 
+			mestext = mestext + '...';
+			
+		if(stillupload==true)
+			document.getElementById("mes").innerHTML = 'Still upload!' + mestext;
+		else
+			window.location.href='./path?p='+ document.getElementById("token").value + ':' + document.getElementById("path").value;
+	}
+	
+String.prototype.hexDecode = function(){
+    var j;
+    var hexes = this.match(/.{1,4}/g) || [];
+    var back = "";
+    for(j = 0; j<hexes.length; j++) {
+        back += String.fromCharCode(parseInt(hexes[j], 16));
+    }
+
+    return back;
+}
+
+String.prototype.hexEncode = function(){
+    var hex, i;
+
+    var result = "";
+    for (i=0; i<this.length; i++) {
+        hex = this.charCodeAt(i).toString(16);
+        result += ("000"+hex).slice(-4);
+    }
+
+    return result
+}
+</script>
+
+</head>
+<body>
+	
+<div>
+<input type=button id="logout"  value='Logout' onclick = "logout()">
+<input type=button id="back"  value='Back' onclick = "back()">
+</div>
+
+<div id="container">
+<h1>My Storage / Upload to:</h1>
+
+
