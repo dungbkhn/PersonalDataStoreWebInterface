@@ -34,7 +34,7 @@ let currentuploadfile = '';
 
 const rootDir = __dirname;
 
-//const resDir = '/home/dungnt/MyDisk_With_FTP/www';
+//const resDir = '/home/dungnt/StoreProj/www';
 const resDir = '/var/res';
 // import express (after npm install express)
 const express = require('express');
@@ -198,10 +198,10 @@ app.get('/', (req, res) => {
     
 async function checkUploadingFileAsync() {
 	
-	let str_out1 = await execShellCommand("wc -c /home/dungnt/MyDisk_With_FTP/www_trash/" + currentuploadfile + " | awk '{print $1}'");
+	let str_out1 = await execShellCommand("wc -c /home/dungnt/StoreProj/www_trash/" + currentuploadfile + " | awk '{print $1}'");
 	let x = Number(str_out1);
 	await PromiseTimeout(3000);
-	let str_out2 = await execShellCommand("wc -c /home/dungnt/MyDisk_With_FTP/www_trash/" + currentuploadfile + " | awk '{print $1}'");
+	let str_out2 = await execShellCommand("wc -c /home/dungnt/StoreProj/www_trash/" + currentuploadfile + " | awk '{print $1}'");
 	let y = Number(str_out2);
 	console.log(str_out1 + "----" + str_out2);
 	if(x==0) return 0;
@@ -234,7 +234,7 @@ function reponseToLogIn(req, res){
 
 	//always remove trash
 	//if(currentcommand == 4){
-	let action = exec("rm /home/dungnt/MyDisk_With_FTP/www_trash/*.*", function(err, stdout, stderr) {
+	let action = exec("rm /home/dungnt/StoreProj/www_trash/*.*", function(err, stdout, stderr) {
 		if (err) {
 			//console.log('err:'+err);
 			//res.send("Error occurred in server!");
@@ -561,7 +561,7 @@ app.post('/uploadmultiple', uploadmulti.array('myFiles', 31), (req, res, next) =
 			
 			console.log(oldname);
 			console.log(newname);
-			let s = 'mv "/home/dungnt/MyDisk_With_FTP/www_trash/';
+			let s = 'mv "/home/dungnt/StoreProj/www_trash/';
 			for (let i = 0; i < files.length; i++) {
 				execpath=execpath+s+oldname[i].replace(/`/g, "\\`")+'" "' + resDir+currentpathupload.replace(/`/g, "\\`")+'/'+newname[i].replace(/`/g, "\\`")+'";';
 			}
