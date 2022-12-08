@@ -1406,8 +1406,8 @@ app.get('/mkdir', (req, res) => {
 			return;
 		}
 		
-		let execpath2 = execpath1 + 'mkdir "./' + dname + '";sudo chgrp -R restriction "./'+dname+'";sudo chown -R store "./'+dname+'";';
-
+		//let execpath2 = execpath1 + 'mkdir "./' + dname + '";sudo chgrp -R restriction "./'+dname+'";sudo chown -R store "./'+dname+'";';
+		let execpath2 = execpath1 + 'mkdir "./' + dname + '";';
 		console.log("execpath2:"+execpath2);
 		/*	
 		//let CmdObj = { "timestamp":"" + (new Date().getTime()),"id":"3", "cmd":"mkdir", "dir":''+resDir + currentdir+'',"name":dname };
