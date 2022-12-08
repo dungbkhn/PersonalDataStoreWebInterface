@@ -34,7 +34,7 @@ let currentuploadfile = '';
 
 const rootDir = __dirname;
 
-const resDir = '/var/res';
+const resDir = './www';
 // import express (after npm install express)
 const express = require('express');
 
