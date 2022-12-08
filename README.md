@@ -6,9 +6,10 @@ Step 1: git clone https://github.com/dungbkhn/PersonalDataStoreWebInterface.git 
  
 Step 2: cd PersonalDataStoreWebInterface <br />
 
-Step 3: sudo apt install nodejs <br />
-        sudo apt install npm <br />
-        npm install find express multer <br />
+Step 3: run these command: <br />
+sudo apt install nodejs <br />
+sudo apt install npm <br />
+npm install find express multer <br />
         
 Step 4: node server.js  <br />       
         
