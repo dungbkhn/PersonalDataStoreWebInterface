@@ -14,6 +14,6 @@ npm install find express multer <br />
 Step 4: start server by command: <br /> 
 node server.js  <br />       
         
-Ok, server is set up at <server_ip>:1999, try to connect to it with username:hello and password:1234. Note that remote server uses certificate not-proved, so the browser will ask to back for safety, you can ignore it and continue to proceed anyway. <br />
+Ok, server is set up at https://<server_ip4 or server_ip6>:19999, try to connect to it with username:hello and password:1234. Note that remote server uses certificate not-proved, so the browser will ask to back for safety, you can ignore it and continue to proceed anyway. <br />
 
 Enjoy it!
