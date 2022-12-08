@@ -34,7 +34,6 @@ let currentuploadfile = '';
 
 const rootDir = __dirname;
 
-//const resDir = '/home/dungnt/StoreProj/www';
 const resDir = '/var/res';
 // import express (after npm install express)
 const express = require('express');
@@ -234,7 +233,7 @@ function reponseToLogIn(req, res){
 
 	//always remove trash
 	//if(currentcommand == 4){
-	let action = exec("rm /home/dungnt/StoreProj/www_trash/*.*", function(err, stdout, stderr) {
+	let action = exec("rm ./www_trash/*.*", function(err, stdout, stderr) {
 		if (err) {
 			//console.log('err:'+err);
 			//res.send("Error occurred in server!");
