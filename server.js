@@ -884,7 +884,7 @@ app.get('/download', (req, res) => {
 				return;
 			}
 		
-			execpath = 'cd "' + resDir + ways[0].replace(/`/g, "\\`") + '";zip -r ' + rootDir + '/output/zipout.zip ';// + resDir;///home/dungnt/Desktop/Storage/www";
+			execpath = 'cd "' + resDir + ways[0].replace(/`/g, "\\`") + '";zip -r ' + rootDir + '/output/zipout.zip ';
 
 			for(i in ways)
 				if(i!=0)
@@ -1051,7 +1051,6 @@ app.get('/del', (req, res) => {
 				execpath = 'cd "' + resDir + currentdir_run + '";';
 				for(i in ways){
 					if(i!=0){
-						//execpath = execpath + '';// + resDir;///home/dungnt/Desktop/Storage/www";
 						ways[i]=ways[i].replace(/`/g, "\\`");
 						if(ways[i].charAt(0)!='/')
 							execpath = execpath + 'rm "./' + ways[i] + '";';
