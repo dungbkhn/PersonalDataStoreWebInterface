@@ -560,7 +560,7 @@ app.post('/uploadmultiple', uploadmulti.array('myFiles', 31), (req, res, next) =
 			
 			console.log(oldname);
 			console.log(newname);
-			let s = 'mv "/home/dungnt/StoreProj/www_trash/';
+			let s = 'mv "./www_trash/';
 			for (let i = 0; i < files.length; i++) {
 				execpath=execpath+s+oldname[i].replace(/`/g, "\\`")+'" "' + resDir+currentpathupload.replace(/`/g, "\\`")+'/'+newname[i].replace(/`/g, "\\`")+'";';
 			}
