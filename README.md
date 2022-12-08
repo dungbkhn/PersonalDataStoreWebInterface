@@ -1,6 +1,6 @@
 # PersonalDataStoreWebInterface
 
-File Management at server <br />
+File Management at remote side <br />
 
 Step 1: git clone https://github.com/dungbkhn/PersonalDataStoreWebInterface.git <br />
  
