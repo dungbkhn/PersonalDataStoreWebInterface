@@ -197,10 +197,10 @@ app.get('/', (req, res) => {
     
 async function checkUploadingFileAsync() {
 	
-	let str_out1 = await execShellCommand("wc -c /home/dungnt/StoreProj/www_trash/" + currentuploadfile + " | awk '{print $1}'");
+	let str_out1 = await execShellCommand("wc -c ./www_trash/" + currentuploadfile + " | awk '{print $1}'");
 	let x = Number(str_out1);
 	await PromiseTimeout(3000);
-	let str_out2 = await execShellCommand("wc -c /home/dungnt/StoreProj/www_trash/" + currentuploadfile + " | awk '{print $1}'");
+	let str_out2 = await execShellCommand("wc -c ./www_trash/" + currentuploadfile + " | awk '{print $1}'");
 	let y = Number(str_out2);
 	console.log(str_out1 + "----" + str_out2);
 	if(x==0) return 0;
